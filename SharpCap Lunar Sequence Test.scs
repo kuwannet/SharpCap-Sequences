@@ -1,0 +1,19 @@
+﻿SEQUENCE
+    DELAY 1
+    LIVE MODE
+    PRESERVE CAMERA SETTINGS
+        SET COLOUR SPACE TO RAW8
+        SET OUTPUT FORMAT TO "SER file (*.ser)"
+        TARGETNAME Moon
+        #Capture 400 Light frames
+        LOOP 5 TIMES
+            SEQUENCE
+                PAD DURATION TO 60
+                    FRAMETYPE Light
+                    AUTOEXPOSE SOLARSYSTEM TARGET 46 FPS
+                    CAPTURE 400 LIVE FRAMES
+                END PAD DURATION
+            END SEQUENCE
+        END LOOP
+    END PRESERVE
+END SEQUENCE
