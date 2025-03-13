@@ -1,0 +1,54 @@
+﻿SEQUENCE
+    DEF SUB partialCollection
+        IGNORE ERRORS FROM ONERROR RUN collect500fps
+            SET GAIN TO 252
+            AUTOEXPOSE SOLARSYSTEM TARGET 1000 FPS
+            DELAY 0.005
+            CAPTURE 500 LIVE FRAMES
+        END IGNORE ERRORS
+    END SUB
+    DEF SUB collect500fps
+        IGNORE ERRORS FROM ONERROR RUN collect250fps
+            SET GAIN TO 252
+            AUTOEXPOSE SOLARSYSTEM TARGET 500 FPS
+            DELAY 0.01
+            CAPTURE 500 LIVE FRAMES
+        END IGNORE ERRORS
+    END SUB
+    DEF SUB collect250fps
+        IGNORE ERRORS FROM ONERROR RUN collectOnError
+            SET GAIN TO 252
+            AUTOEXPOSE SOLARSYSTEM TARGET 250 FPS
+            DELAY 0.02
+            CAPTURE 500 LIVE FRAMES
+        END IGNORE ERRORS
+    END SUB
+    DEF SUB collectOnError
+        SET GAIN TO 252
+        SET EXPOSURE TO 0.001
+        DELAY 0.005
+        CAPTURE 500 LIVE FRAMES
+    END SUB
+    PRESERVE CAMERA SETTINGS
+        UNLOCK CONTROLS
+            LIVE MODE
+            ARRANGE FILES IN ONE FOLDER
+            TARGETNAME PartialLunarEclipse
+            SET GAIN TO 252
+            IGNORE ERRORS FROM ONERROR RUN ""
+                SET OFFSET TO 3
+            END IGNORE ERRORS
+            SET COLOUR SPACE TO RAW8
+            SET OUTPUT FORMAT TO "SER file (*.ser)"
+            STOP AT LOCALTIME "1:48:00 AM"
+                LOOP UNTIL LATER THAN LOCALTIME "1:48:00 AM"
+                    PAD DURATION TO 60
+                        GOSUB partialCollection
+                    END PAD DURATION
+                END LOOP
+            END STOP AT
+            PLAY SOUND Alert
+            SHOW NOTIFICATION "Lunar Eclipse Collection is complete!" COLOUR Green DURATION 120
+        END UNLOCK
+    END PRESERVE
+END SEQUENCE

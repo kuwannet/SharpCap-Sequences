@@ -1,0 +1,45 @@
+SEQUENCE
+
+    DEF SUB totalityCollection
+        SET EXPOSURE TO 0.01
+        DELAY 0.05
+        CAPTURE 300 LIVE FRAMES
+        
+        SET EXPOSURE TO 0.1
+        DELAY 0.5
+        CAPTURE 50 LIVE FRAMES
+        
+        SET EXPOSURE TO 1
+        DELAY 3
+        CAPTURE 10 LIVE FRAMES
+        
+        SET EXPOSURE TO 2
+        DELAY 3
+        CAPTURE 10 LIVE FRAMES
+    END SUB
+
+    PRESERVE CAMERA SETTINGS
+        UNLOCK CONTROLS
+
+            LIVE MODE
+            ARRANGE FILES IN ONE FOLDER
+            TARGETNAME "FullLunarEclipse"
+            SET GAIN TO 252
+            SET OFFSET to 3
+            SET COLOUR SPACE TO RAW8
+            SET OUTPUT FORMAT TO "SER file (*.ser)"
+
+                STOP AT LOCALTIME 00:32:00
+                    LOOP UNTIL LATER THAN LOCALTIME 00:32:00
+                        PAD DURATION TO 60
+                            GOSUB totalityCollection
+                        END PAD DURATION
+                    END LOOP
+                END STOP AT
+                
+            PLAY SOUND Alert
+            SHOW NOTIFICATION "Lunar Eclipse Totality is complete!" COLOUR Green DURATION 120
+        END UNLOCK
+    END PRESERVE
+
+END SEQUENCE

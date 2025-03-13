@@ -1,0 +1,33 @@
+SEQUENCE
+
+    DEF SUB partialCollection
+        SET EXPOSURE TO 0.001
+        DELAY 0.005
+        CAPTURE 500 LIVE FRAMES
+    END SUB
+
+    PRESERVE CAMERA SETTINGS
+        UNLOCK CONTROLS
+
+            LIVE MODE
+            ARRANGE FILES IN ONE FOLDER
+            TARGETNAME "PartialLunarEclipse"
+            SET GAIN TO 252
+            SET OFFSET to 3
+            SET COLOUR SPACE TO RAW8
+            SET OUTPUT FORMAT TO "SER file (*.ser)"
+
+                STOP AT LOCALTIME 01:48:00
+                    LOOP UNTIL LATER THAN LOCALTIME 01:48:00
+                        PAD DURATION TO 60
+                            GOSUB partialCollection
+                        END PAD DURATION
+                    END LOOP
+                END STOP AT
+                
+            PLAY SOUND Alert
+            SHOW NOTIFICATION "Lunar Eclipse Collection is complete!" COLOUR Green DURATION 120
+        END UNLOCK
+    END PRESERVE
+
+END SEQUENCE

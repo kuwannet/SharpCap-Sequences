@@ -1,0 +1,142 @@
+# partial_begins: 22:09:00
+# partial_ends: 01:47:00
+# full_begins: 23:26:00
+# full_ends: 00:31:00
+#
+# ####################################
+# partialCollection Plan
+# ####################################
+# Wait for 0.005 seconds
+# Step: 1 - Capture 500 frames at Exposure 0.001 seconds
+#
+#
+# ####################################
+# totalityCollection Plan
+# ####################################
+# Wait for 0.005 seconds
+# Step: 1 - Capture 300 frames at Exposure 0.001 seconds
+# Wait for 0.05 seconds
+# Step: 2 - Capture 300 frames at Exposure 0.01 seconds
+# Wait for 0.5 seconds
+# Step: 3 - Capture 50 frames at Exposure 0.1 seconds
+# Wait for 4 seconds
+# Step: 4 - Capture 20 frames at Exposure 1 seconds
+#
+#
+#
+#
+# ## Begin Sequence
+#
+#
+# Wait until 22:09:00
+# Collect 'partialCollection' every 60 seconds, until 23:25:00
+#
+# Wait until 23:26:00
+# Collect 'totalityCollection' every 60 seconds, until 00:31:00
+#
+# ## End Sequence
+#
+#
+
+
+SEQUENCE
+
+    DEF SUB partialCollection
+        SET EXPOSURE TO 0.001
+        DELAY 0.005
+        CAPTURE 500 LIVE FRAMES
+    END SUB
+
+    DEF SUB totalityCollection
+        SET EXPOSURE TO 0.001
+        DELAY 0.005
+        CAPTURE 300 LIVE FRAMES
+        SET EXPOSURE TO 0.01
+        DELAY 0.05
+        CAPTURE 300 LIVE FRAMES
+        SET EXPOSURE TO 0.1
+        DELAY 0.5
+        CAPTURE 50 LIVE FRAMES
+        SET EXPOSURE TO 1
+        DELAY 4
+        CAPTURE 20 LIVE FRAMES
+    END SUB
+
+    DEF SUB waitForPreEclipseStart
+        WAIT UNTIL LATER THAN LOCALTIME 22:06:00
+    END SUB
+
+    DEF SUB waitForEclipseStart
+        WAIT UNTIL LATER THAN LOCALTIME 22:07:00
+    END SUB
+
+    DEF SUB waitForPostTotalityPartialStart
+        WAIT UNTIL LATER THAN LOCALTIME 00:33:00
+    END SUB
+
+    DEF SUB waitForEclipseEnd
+        WAIT UNTIL LATER THAN LOCALTIME 01:48:00
+    END SUB
+
+    DEF SUB waitForPostEclipseEnd
+        WAIT UNTIL LATER THAN LOCALTIME 01:49:00
+    END SUB
+
+    DEF SUB waitForTotalityStart
+        WAIT UNTIL LATER THAN LOCALTIME 23:25:00
+    END SUB
+
+    PRESERVE CAMERA SETTINGS
+        UNLOCK CONTROLS
+
+            LIVE MODE
+            ARRANGE FILES IN ONE FOLDER
+            TARGETNAME "PartialPreEclipse"
+            SET GAIN TO 252
+            SET OFFSET to 3
+            SET COLOUR SPACE TO RAW8
+            SET OUTPUT FORMAT TO "SER file (*.ser)"
+
+            IF EARLIER THAN LOCALTIME 23:24:00
+                GOSUB waitForEclipseStart
+                STOP AT LOCALTIME 23:24:00
+                    LOOP UNTIL LATER THAN LOCALTIME 23:24:00
+                        PAD DURATION TO 60
+                            GOSUB partialCollection
+                        END PAD DURATION
+                    END LOOP
+                END STOP AT
+            END IF
+
+#            IF EARLIER THAN LOCALTIME 23:50:00
+                GOSUB waitForTotalityStart
+                TARGETNAME "FullEclipse"
+                STOP AT LOCALTIME 00:32:00
+                    LOOP UNTIL LATER THAN LOCALTIME 00:32:00
+                        PAD DURATION TO 60
+                            GOSUB totalityCollection
+                        END PAD DURATION
+                    END LOOP
+                END STOP AT
+#            END IF
+
+#            IF EARLIER THAN LOCALTIME 23:59:00
+                GOSUB waitForPostTotalityPartialStart
+                TARGETNAME "PartialPostEclipse"
+                STOP AT LOCALTIME 01:48:00
+                    LOOP UNTIL LATER THAN LOCALTIME 01:48:00
+                        PAD DURATION TO 60
+                            GOSUB partialCollection
+                        END PAD DURATION
+                    END LOOP
+                END STOP AT
+#            END IF
+
+            PLAY SOUND Alert
+            SHOW NOTIFICATION "Lunar Eclipse Collection is complete!" COLOUR Green DURATION 120
+        END UNLOCK
+    END PRESERVE
+
+
+
+END SEQUENCE
